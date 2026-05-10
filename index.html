@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nepal Tech Jobs</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f; --surface: #13131a; --border: #1e1e2e;
+    --accent: #00ff88; --accent2: #ff6b35;
+    --text: #e8e8f0; --muted: #6b6b8a; --card: #16161f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  header { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .header-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .brand-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+  h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 700; line-height: 1.1; letter-spacing: -1px; }
+  h1 span { color: var(--accent); }
+  .subtitle { color: var(--muted); font-size: 15px; margin-top: 6px; }
+  .scan-btn { background: var(--accent); color: #000; border: none; padding: 14px 28px; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; border-radius: 4px; transition: all 0.2s; white-space: nowrap; align-self: flex-start; margin-top: 8px; }
+  .scan-btn:hover { background: #00cc6a; transform: translateY(-1px); }
+  .scan-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .stats-bar { display: flex; gap: 32px; padding: 20px 0; border-bottom: 1px solid var(--border); margin-bottom: 32px; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-val { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .status-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 24px; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+  .status-dot.active { background: var(--accent); animation: blink 1s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  /* FILTERS */
+  .filters-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 24px; }
+  .filters-row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+  .filter-group { display: flex; flex-direction: column; gap: 8px; }
+  .filter-group-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+  .search-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 9px 14px; border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; width: 240px; transition: border-color 0.2s; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  .tag-list { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { background: var(--bg); border: 1px solid var(--border); color: var(--muted); padding: 5px 11px; border-radius: 20px; font-size: 11px; font-family: 'Space Mono', monospace; cursor: pointer; transition: all 0.15s; user-select: none; }
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+  .tag.active { background: rgba(0,255,136,0.12); border-color: var(--accent); color: var(--accent); }
+
+  .company-checks { display: flex; gap: 6px; flex-wrap: wrap; max-width: 480px; }
+  .check-label { display: flex; align-items: center; gap: 5px; padding: 5px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; font-size: 12px; cursor: pointer; transition: all 0.15s; user-select: none; }
+  .check-label:hover { border-color: var(--muted); }
+  .check-label input { accent-color: var(--accent); cursor: pointer; }
+  .check-label.checked { border-color: rgba(0,255,136,0.4); color: var(--accent); background: rgba(0,255,136,0.06); }
+
+  .clear-btn { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 14px; border-radius: 4px; font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .clear-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .results-count { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+  .results-count span { color: var(--accent); }
+
+  /* JOB CARDS */
+  .jobs-flat-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 60px; }
+  .job-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 18px 22px; transition: border-color 0.2s, transform 0.15s; animation: fadeUp 0.3s ease both; }
+  .job-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .job-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .job-card-title { font-size: 15px; font-weight: 600; }
+  .job-company-tag { display: flex; align-items: center; gap: 5px; background: var(--surface); border: 1px solid var(--border); padding: 3px 10px; border-radius: 20px; font-size: 11px; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .job-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+  .job-req { font-size: 12px; color: #8888bb; line-height: 1.5; padding: 8px 12px; background: rgba(255,255,255,0.03); border-left: 2px solid var(--border); margin-bottom: 10px; font-style: italic; }
+  .job-link { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-family: 'Space Mono', monospace; color: var(--accent); text-decoration: none; opacity: 0.8; transition: opacity 0.15s; }
+  .job-link:hover { opacity: 1; }
+
+  /* SKELETON */
+  .skeleton-list { display: flex; flex-direction: column; gap: 12px; }
+  .skeleton-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .skeleton-line { background: var(--border); border-radius: 4px; margin-bottom: 10px; }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .empty-sub { font-size: 13px; }
+
+  footer { border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px; }
+  footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-tag">// Nepal Tech Job Scanner</div>
+        <h1>Find Jobs at<br/><span>Nepal's Top Tech</span> Cos.</h1>
+        <div class="subtitle">Scrapes careers pages in real-time. No middlemen.</div>
+      </div>
+      <button class="scan-btn" id="scanBtn" onclick="scanJobs()">⚡ SCAN NOW</button>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat"><div class="stat-val" id="statCompanies">0</div><div class="stat-label">Companies</div></div>
+    <div class="stat"><div class="stat-val" id="statJobs">0</div><div class="stat-label">Jobs Found</div></div>
+    <div class="stat"><div class="stat-val" id="statSuccess">0</div><div class="stat-label">Pages Reached</div></div>
+    <div class="stat"><div class="stat-val" id="statTime">0s</div><div class="stat-label">Scan Time</div></div>
+  </div>
+
+  <div id="statusBar" class="status-bar" style="display:none">
+    <div class="status-dot active" id="statusDot"></div>
+    <span id="statusText">Initializing...</span>
+  </div>
+
+  <div class="filters-panel" id="filtersPanel" style="display:none">
+    <div class="filters-row">
+      <div class="filter-group">
+        <div class="filter-group-label">Search</div>
+        <input type="text" class="search-input" id="searchInput" placeholder="Title or keyword..." oninput="applyFilters()"/>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-label">Quick Tags</div>
+        <div class="tag-list">
+          <div class="tag" onclick="toggleTag(this)" data-kw="devops">DevOps</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="cloud">Cloud</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="intern">Intern</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="senior">Senior</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="junior">Junior</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="network">Network</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="developer">Developer</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="engineer">Engineer</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="qa">QA</div>
+          <div class="tag" onclick="toggleTag(this)" data-kw="designer">Designer</div>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-label">Companies</div>
+        <div class="company-checks" id="companyChecks"></div>
+      </div>
+      <div class="filter-group" style="justify-content:flex-end">
+        <button class="clear-btn" onclick="clearFilters()">✕ Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-count" id="resultsCount" style="display:none"></div>
+  <div id="mainContent">
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">Ready to Scan</div>
+      <div class="empty-sub">Hit "Scan Now" to scrape Nepal's top tech company career pages live.</div>
+    </div>
+  </div>
+
+  <footer>Built with <span>Node.js + Express + Cheerio</span> &nbsp;·&nbsp; Ukesh Dhakal &nbsp;·&nbsp; ukeshdhakal.com.np</footer>
+</div>
+
+<script>
+  let allJobs = [];
+  let activeKeywords = new Set();
+  let activeCompanies = new Set();
+
+  async function scanJobs() {
+    const btn = document.getElementById('scanBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ SCANNING...';
+    allJobs = [];
+    activeKeywords.clear();
+    activeCompanies.clear();
+
+    document.getElementById('statsBar').style.display = 'flex';
+    document.getElementById('statusBar').style.display = 'flex';
+    document.getElementById('filtersPanel').style.display = 'none';
+    document.getElementById('resultsCount').style.display = 'none';
+    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+
+    setStatus('Connecting to career pages...', true);
+    showSkeletons();
+
+    const t0 = Date.now();
+    try {
+      const resp = await fetch('/api/jobs');
+      const data = await resp.json();
+
+      for (const company of data.companies) {
+        for (const job of company.jobs) {
+          allJobs.push({ ...job, company: company.name, logo: company.logo, color: company.color });
+        }
+      }
+
+      const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
+      const successes = data.companies.filter(c => c.status === 'success').length;
+
+      document.getElementById('statCompanies').textContent = data.companies.length;
+      document.getElementById('statJobs').textContent = allJobs.length;
+      document.getElementById('statSuccess').textContent = successes;
+      document.getElementById('statTime').textContent = elapsed + 's';
+
+      setStatus(`Scan complete — ${allJobs.length} jobs found across ${successes} companies.`, false);
+      buildCompanyFilters(data.companies);
+
+      document.getElementById('filtersPanel').style.display = 'block';
+      document.getElementById('resultsCount').style.display = 'block';
+      document.getElementById('searchInput').value = '';
+      applyFilters();
+    } catch (e) {
+      setStatus('Error — is the server running on port 3000?', false);
+      document.getElementById('mainContent').innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Connection Error</div><div class="empty-sub">Run: node server.js</div></div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = '⚡ SCAN AGAIN';
+  }
+
+  function buildCompanyFilters(companies) {
+    const container = document.getElementById('companyChecks');
+    activeCompanies = new Set(companies.map(c => c.name));
+    container.innerHTML = companies.map(c => `
+      <label class="check-label checked" data-company="${escHtml(c.name)}">
+        <input type="checkbox" checked onchange="toggleCompany(this, '${escHtml(c.name)}')" />
+        ${c.logo} ${escHtml(c.name)}
+      </label>`).join('');
+  }
+
+  function toggleTag(el) {
+    el.classList.toggle('active');
+    const kw = el.dataset.kw;
+    if (activeKeywords.has(kw)) activeKeywords.delete(kw);
+    else activeKeywords.add(kw);
+    applyFilters();
+  }
+
+  function toggleCompany(cb, name) {
+    cb.closest('.check-label').classList.toggle('checked', cb.checked);
+    if (cb.checked) activeCompanies.add(name);
+    else activeCompanies.delete(name);
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const keywords = [...activeKeywords];
+
+    const filtered = allJobs.filter(job => {
+      if (!activeCompanies.has(job.company)) return false;
+      const hay = (job.title + ' ' + job.description + ' ' + job.requirements).toLowerCase();
+      if (keywords.length > 0 && !keywords.every(k => hay.includes(k))) return false;
+      if (q && !(hay + job.company.toLowerCase()).includes(q)) return false;
+      return true;
+    });
+
+    document.getElementById('resultsCount').innerHTML =
+      `Showing <span>${filtered.length}</span> of <span>${allJobs.length}</span> jobs`;
+    renderJobs(filtered);
+  }
+
+  function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    activeKeywords.clear();
+    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.check-label input').forEach(cb => {
+      cb.checked = true;
+      cb.closest('.check-label').classList.add('checked');
+    });
+    activeCompanies = new Set(allJobs.map(j => j.company));
+    applyFilters();
+  }
+
+  function renderJobs(jobs) {
+    if (!jobs.length) {
+      document.getElementById('mainContent').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">😶</div>
+          <div class="empty-title">No jobs match</div>
+          <div class="empty-sub">Try adjusting your filters.</div>
+        </div>`;
+      return;
+    }
+    document.getElementById('mainContent').innerHTML = `<div class="jobs-flat-list">${
+      jobs.map((j, i) => `
+        <div class="job-card" style="animation-delay:${i*0.025}s">
+          <div class="job-card-top">
+            <div class="job-card-title">${escHtml(j.title)}</div>
+            <div class="job-company-tag">${j.logo} ${escHtml(j.company)}</div>
+          </div>
+          <div class="job-desc">${escHtml(j.description)}</div>
+          ${j.requirements ? `<div class="job-req">${escHtml(j.requirements.slice(0,180))}...</div>` : ''}
+          <a class="job-link" href="${j.link}" target="_blank">View full listing →</a>
+        </div>`).join('')
+    }</div>`;
+  }
+
+  function showSkeletons() {
+    document.getElementById('mainContent').innerHTML = `<div class="skeleton-list">${
+      Array.from({length:5}, () => `
+        <div class="skeleton-card">
+          <div class="skeleton-line" style="height:14px;width:45%;margin-bottom:14px"></div>
+          <div class="skeleton-line" style="height:10px;width:85%"></div>
+          <div class="skeleton-line" style="height:10px;width:65%"></div>
+        </div>`).join('')
+    }</div>`;
+  }
+
+  function setStatus(msg, active) {
+    document.getElementById('statusText').textContent = msg;
+    document.getElementById('statusDot').classList.toggle('active', active);
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>

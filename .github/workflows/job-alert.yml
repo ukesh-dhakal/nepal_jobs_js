@@ -1,0 +1,35 @@
+name: Nepal Jobs — Daily Intern Alert
+
+on:
+  schedule:
+    - cron: '15 3 * * *'   # 03:15 UTC = 09:00 AM Nepal time (UTC+5:45)
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+jobs:
+  job-alert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run job alert script
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: node notify.js
+
+      - name: Commit updated seen_jobs.json (if changed)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_jobs.json
+          git diff --cached --quiet || git commit -m "chore: update seen_jobs.json [skip ci]"
+          git push
